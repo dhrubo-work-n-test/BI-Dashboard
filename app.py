@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
-import plotly.graph_objects as go
 from sklearn.ensemble import RandomForestRegressor, IsolationForest
 from prophet import Prophet
 
@@ -69,44 +68,20 @@ if uploaded_file:
             model.fit(X, y)
             df['Predicted_Spend'] = model.predict(X)
 
-            # --- LINE CHART: Predicted vs Actual Spend ---
-            fig = go.Figure()
-
-            fig.add_trace(go.Scatter(
-                x=df.index,
-                y=df['Actual_Spend'],
-                mode='lines+markers',
-                name='Actual Spend',
-                line=dict(color='cyan', width=2)
-            ))
-
-            fig.add_trace(go.Scatter(
-                x=df.index,
-                y=df['Predicted_Spend'],
-                mode='lines+markers',
-                name='Predicted Spend',
-                line=dict(color='magenta', width=2, dash='dash')
-            ))
-
-            fig.update_layout(
-                title='📊 Predicted vs Actual Spend (Linear Chart)',
-                xaxis_title='Record Index / Month',
-                yaxis_title='Spend (₹)',
-                template='plotly_dark',
-                hovermode='x unified',
-                legend=dict(
-                    title='Legend',
-                    orientation='h',
-                    yanchor='bottom',
-                    y=1.02,
-                    xanchor='right',
-                    x=1
-                ),
-                margin=dict(l=40, r=40, t=80, b=40),
+            # --- UPDATED LINE CHART (instead of scatter) ---
+            df = df.reset_index().rename(columns={'index': 'Record'})
+            fig = px.line(
+                df,
+                x="Record",
+                y=["Actual_Spend", "Predicted_Spend"],
+                labels={"value": "Spend (₹)", "Record": "Record Index"},
+                title="Predicted vs Actual Spend (Line Chart)",
+                template="plotly_dark"
             )
-
+            fig.update_traces(mode="lines+markers")
             st.plotly_chart(fig, use_container_width=True)
-            st.info("💡 Hover over the chart to see predicted vs actual spend comparison.")
+            st.info("💡 Hover to see Actual vs Predicted spend per record.")
+
         else:
             st.error("❌ Columns missing: Planned_Budget, Total_Planned_Budget")
 
