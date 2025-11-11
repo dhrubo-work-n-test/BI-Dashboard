@@ -68,20 +68,14 @@ if uploaded_file:
             model.fit(X, y)
             df['Predicted_Spend'] = model.predict(X)
 
-            # --- UPDATED LINE CHART (instead of scatter) ---
-            df = df.reset_index().rename(columns={'index': 'Record'})
-            fig = px.line(
-                df,
-                x="Record",
-                y=["Actual_Spend", "Predicted_Spend"],
-                labels={"value": "Spend (₹)", "Record": "Record Index"},
-                title="Predicted vs Actual Spend (Line Chart)",
-                template="plotly_dark"
+            fig = px.scatter(
+                df, x="Planned_Budget", y="Actual_Spend",
+                color="Department" if "Department" in df.columns else None,
+                hover_data=["Predicted_Spend"],
+                title="Predicted vs Actual Spend", template="plotly_dark"
             )
-            fig.update_traces(mode="lines+markers")
             st.plotly_chart(fig, use_container_width=True)
-            st.info("💡 Hover to see Actual vs Predicted spend per record.")
-
+            st.info("💡 Hover to see predicted spend per department.")
         else:
             st.error("❌ Columns missing: Planned_Budget, Total_Planned_Budget")
 
