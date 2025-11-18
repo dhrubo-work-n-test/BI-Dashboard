@@ -125,11 +125,16 @@ if uploaded_file:
     elif model_choice == "Budget Forecasting":
         st.subheader("📅 Forecast Total Budget Trend")
 
-    if 'Month' in df.columns and 'Actual_Spend' in df.columns:
+    if 'Month' in df.columns and 'Actual_Spend' in df.columns':
 
-        # 🔥 Hardcode year 2026 into month conversion
-        current_year = 2026
-        df['Month'] = df['Month'].apply(lambda x: pd.to_datetime(f"{x} {current_year}"))
+        # 🔥 FIX: Convert Month column into actual datetime
+        # Handles formats like: "Jan-24", "2024-01", "January 2024", etc.
+        try:
+            df['Month'] = pd.to_datetime(df['Month'])
+        except:
+            # If dataset only has month names (Jan, Feb), assign current year
+            current_year = datetime.now().year
+            df['Month'] = df['Month'].apply(lambda x: pd.to_datetime(f"{x} {current_year}"))
 
         df_forecast = df.groupby('Month')[['Actual_Spend']].sum().reset_index()
         df_forecast.columns = ['ds', 'y']
@@ -145,9 +150,9 @@ if uploaded_file:
             template="plotly_dark"
         )
         fig.add_scatter(
-            x=df_forecast['ds'],
-            y=df_forecast['y'],
-            mode='markers',
+            x=df_forecast['ds'], 
+            y=df_forecast['y'], 
+            mode='markers', 
             name='Actual'
         )
 
