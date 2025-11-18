@@ -125,10 +125,9 @@ if uploaded_file:
     elif model_choice == "Budget Forecasting":
     st.subheader("📅 Forecast Total Budget Trend")
 
-    if 'Month' in df.columns and 'Actual_Spend' in df.columns':
+    if 'Month' in df.columns and 'Actual_Spend' in df.columns:
 
         # 🔥 FIX: Convert Month column into actual datetime
-        # Handles formats like: "Jan-24", "2024-01", "January 2024", etc.
         try:
             df['Month'] = pd.to_datetime(df['Month'])
         except:
@@ -150,9 +149,9 @@ if uploaded_file:
             template="plotly_dark"
         )
         fig.add_scatter(
-            x=df_forecast['ds'], 
-            y=df_forecast['y'], 
-            mode='markers', 
+            x=df_forecast['ds'],
+            y=df_forecast['y'],
+            mode='markers',
             name='Actual'
         )
 
@@ -161,4 +160,3 @@ if uploaded_file:
 
     else:
         st.error("❌ Columns missing: Month, Actual_Spend")
-
