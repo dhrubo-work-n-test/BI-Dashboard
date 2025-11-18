@@ -123,7 +123,7 @@ if uploaded_file:
             st.error("❌ Column missing: Variance")
 
     elif model_choice == "Budget Forecasting":
-    st.subheader("📅 Forecast Total Budget Trend")
+        st.subheader("📅 Forecast Total Budget Trend")
 
     if 'Month' in df.columns and 'Actual_Spend' in df.columns:
 
