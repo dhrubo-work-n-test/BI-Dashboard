@@ -132,7 +132,7 @@ if uploaded_file:
             df['Month'] = pd.to_datetime(df['Month'])
         except:
             # If dataset only has month names (Jan, Feb), assign current year
-            current_year = datetime.now().year
+            current_year = 2026
             df['Month'] = df['Month'].apply(lambda x: pd.to_datetime(f"{x} {current_year}"))
 
         df_forecast = df.groupby('Month')[['Actual_Spend']].sum().reset_index()
