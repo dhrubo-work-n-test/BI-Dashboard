@@ -123,27 +123,42 @@ if uploaded_file:
             st.error("❌ Column missing: Variance")
 
     elif model_choice == "Budget Forecasting":
-        st.subheader("📅 Forecast Total Budget Trend")
+    st.subheader("📅 Forecast Total Budget Trend")
 
-        if 'Month' in df.columns and 'Actual_Spend' in df.columns:
-            df_forecast = df.groupby('Month')[['Actual_Spend']].sum().reset_index()
-            df_forecast.columns = ['ds', 'y']
+    if 'Month' in df.columns and 'Actual_Spend' in df.columns':
 
-            m = Prophet()
-            m.fit(df_forecast)
-            future = m.make_future_dataframe(periods=3, freq='M')
-            forecast = m.predict(future)
+        # 🔥 FIX: Convert Month column into actual datetime
+        # Handles formats like: "Jan-24", "2024-01", "January 2024", etc.
+        try:
+            df['Month'] = pd.to_datetime(df['Month'])
+        except:
+            # If dataset only has month names (Jan, Feb), assign current year
+            current_year = datetime.now().year
+            df['Month'] = df['Month'].apply(lambda x: pd.to_datetime(f"{x} {current_year}"))
 
-            fig = px.line(
-                forecast, x='ds', y='yhat',
-                title="Predicted Spend Trend (Next 3 Months)",
-                template="plotly_dark"
-            )
-            fig.add_scatter(x=df_forecast['ds'], y=df_forecast['y'], mode='markers', name='Actual')
-            st.plotly_chart(fig, use_container_width=True)
-            st.info("💡 Forecast shows upcoming monthly spending trends.")
-        else:
-            st.error("❌ Columns missing: Month, Actual_Spend")
+        df_forecast = df.groupby('Month')[['Actual_Spend']].sum().reset_index()
+        df_forecast.columns = ['ds', 'y']
 
-else:
-    st.warning("⬆️ Upload your dataset to start exploring predictions.")
+        m = Prophet()
+        m.fit(df_forecast)
+        future = m.make_future_dataframe(periods=3, freq='M')
+        forecast = m.predict(future)
+
+        fig = px.line(
+            forecast, x='ds', y='yhat',
+            title="Predicted Spend Trend (Next 3 Months)",
+            template="plotly_dark"
+        )
+        fig.add_scatter(
+            x=df_forecast['ds'], 
+            y=df_forecast['y'], 
+            mode='markers', 
+            name='Actual'
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
+        st.info("💡 Forecast shows upcoming monthly spending trends.")
+
+    else:
+        st.error("❌ Columns missing: Month, Actual_Spend")
+
